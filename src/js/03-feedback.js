@@ -11,7 +11,7 @@ if (savedFormData !== null) {
 
 feedbackForm.addEventListener(
   'input',
-  throttle(event => {
+  throttle(e => {
     const formData = {
       email: `${feedbackForm['email'].value}`,
       message: `${feedbackForm['message'].value}`,
@@ -22,8 +22,8 @@ feedbackForm.addEventListener(
   }, 500)
 );
 
-feedbackForm.addEventListener('submit', event => {
-  event.preventDefault();
+feedbackForm.addEventListener('submit', e => {
+  e.preventDefault();
 
   const formData = {
     email: `${feedbackForm['email'].value}`,
