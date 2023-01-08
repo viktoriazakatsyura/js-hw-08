@@ -1,37 +1,41 @@
 import throttle from 'lodash.throttle';
-const feedbackForm = document.querySelector('.feedback-form');
+const STORAGE_KEY = 'feedback-form-state';
 
-const savedFormDataJSON = localStorage.getItem('feedback-form-state');
-const savedFormData = JSON.parse(savedFormDataJSON);
+const form = document.querySelector('.feedback-form');
+const textarea = document.querySelector('textarea');
+const inputEl = document.querySelector('input');
+form.addEventListener('submit', onFormSubmit);
+form.addEventListener('input', throttle(onFormInput, 500));
 
-if (savedFormData !== null) {
-  feedbackForm['email'].value = savedFormData.email;
-  feedbackForm['message'].value = savedFormData.message;
+function onFormInput() {
+  const formData = { email: inputEl.value, message: textarea.value };
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
 }
 
-feedbackForm.addEventListener(
-  'input',
-  throttle(event => {
-    const formData = {
-      email: `${feedbackForm['email'].value}`,
-      message: `${feedbackForm['message'].value}`,
-    };
-    const formDataJSON = JSON.stringify(formData);
+function onFormSubmit(e) {
+  evt.preventDefault();
+  if (
+    e.currentTarget.email.value === '' ||
+    e.currentTarget.message.value === ''
+  ) {
+    console.log('no data');
+  } else {
+    console.log(JSON.parse(localStorage.getItem(STORAGE_KEY)));
+    localStorage.removeItem(STORAGE_KEY);
+    evt.currentTarget.reset();
+  }
+}
 
-    localStorage.setItem('feedback-form-state', formDataJSON);
-  }, 500)
-);
+function checkStorage() {
+  const parseSavedData = JSON.parse(localStorage.getItem(STORAGE_KEY));
 
-feedbackForm.addEventListener('submit', event => {
-  event.preventDefault();
-
-  const formData = {
-    email: `${feedbackForm['email'].value}`,
-    message: `${feedbackForm['message'].value}`,
-  };
-  console.log(formData);
-
-  localStorage.removeItem('feedback-form-state');
-  feedbackForm['email'].value = '';
-  feedbackForm['message'].value = '';
-});
+  if (parseSavedData) {
+    inputEl.value = parseSavedData.email;
+    textarea.value = parseSavedData.message;
+  } else {
+    inputEl.value = '';
+    textarea.value = '';
+  }
+}
+checkStorage();
